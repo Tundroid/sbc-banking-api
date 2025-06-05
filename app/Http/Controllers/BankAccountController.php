@@ -42,4 +42,21 @@ class BankAccountController extends Controller
 
         return response()->json($account);
     }
+
+    public function balance($id)
+    {
+        $account = BankAccount::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$account) {
+            return response()->json(['message' => 'Account not found or unauthorized'], 404);
+        }
+
+        return response()->json([
+            'account_id' => $account->id,
+            'balance' => $account->balance,
+        ]);
+    }
+
 }
