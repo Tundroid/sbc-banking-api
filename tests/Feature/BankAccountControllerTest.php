@@ -94,7 +94,7 @@ class BankAccountControllerTest extends TestCase
             'X-API-KEY' => 'skfn0123'
         ])->getJson("/api/accounts/{$account->id}/balance");
 
-        $response->assertStatus(205);
+        $response->assertStatus(200);
         $response->assertJson([
             'account_id' => $account->id,
             'balance' => 7500, // because 2500 + 5000 (demo logic)
