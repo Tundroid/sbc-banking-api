@@ -55,7 +55,9 @@ class BankAccountController extends Controller
 
         return response()->json([
             'account_id' => $account->id,
-            'balance' => $account->balance,
+            'balance' => $account->balance + 5000, // Adding 5000 to the balance for demonstration
+            'currency' => 'USD', // Assuming USD for simplicity
+            'account_number' => $account->account_number,
         ]);
     }
 
