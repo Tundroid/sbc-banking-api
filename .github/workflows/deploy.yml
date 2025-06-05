@@ -30,14 +30,8 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: 🧪 Run Tests (Optional, skip if none)
-        run: php artisan test || true
-
-      - name: Decode SSH Key
-        run: |
-          echo "$SSH_PRIVATE_KEY_B64" | base64 -d > id_rsa
-          chmod 600 id_rsa
-        env:
-          SSH_PRIVATE_KEY_B64: ${{ secrets.SSH_PRIVATE_KEY_B64 }}
+        run: php artisan test
+        # run: php artisan test || true
 
       - name: 🚀 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -45,7 +39,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          # key_path: id_rsa
           port: 22
           script: |
             cd /var/www/sbc-banking-api
