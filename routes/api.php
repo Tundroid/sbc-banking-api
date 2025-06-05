@@ -12,9 +12,15 @@ Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
     Route::get('/accounts/{id}', [BankAccountController::class, 'show']);
     Route::post('/accounts', [BankAccountController::class, 'store']);
     Route::get('/accounts/{id}/balance', [BankAccountController::class, 'balance']);
-    Route::get('/accounts/{id}/history', [BankAccountController::class, 'history']);
-    Route::post('/transfer', [TransferController::class, 'store']);
+    Route::get('/accounts/{accountId}/transfers', [TransferController::class, 'history']);
+    Route::post('/transfers', [TransferController::class, 'store']);
 });
+
+
+// Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
+//     Route::post('/transfers', [TransferController::class, 'store']);
+//     Route::get('/accounts/{accountId}/transfers', [TransferController::class, 'history']);
+// });
 
 
 
