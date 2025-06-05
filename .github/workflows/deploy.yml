@@ -41,8 +41,8 @@ jobs:
           script: |
             cd /var/www/sbc-banking-api
             git pull origin main
-            composer install --no-interaction --prefer-dist --optimize-autoloader
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            # composer install --no-interaction --prefer-dist --optimize-autoloader
+            # php artisan migrate --force
+            # php artisan config:cache
+            # php artisan route:cache
+            # php artisan view:cache
