@@ -6,6 +6,7 @@ on:
       - main
 
 jobs:
+  
   build-and-deploy:
     name: Build and Deploy Laravel App
     runs-on: ubuntu-latest
@@ -31,12 +32,20 @@ jobs:
       - name: 🧪 Run Tests (Optional, skip if none)
         run: php artisan test || true
 
+      - name: Decode SSH Key
+        run: |
+          echo "$SSH_PRIVATE_KEY_B64" | base64 -d > id_rsa
+          chmod 600 id_rsa
+        env:
+          SSH_PRIVATE_KEY_B64: ${{ secrets.SSH_PRIVATE_KEY_B64 }}
+
       - name: 🚀 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          # key: ${{ secrets.VPS_SSH_KEY }}
+          key_path: id_rsa
           port: 22
           script: |
             cd /var/www/sbc-banking-api
