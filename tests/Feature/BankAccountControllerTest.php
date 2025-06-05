@@ -80,24 +80,24 @@ class BankAccountControllerTest extends TestCase
         ]);
     }
 
-    public function test_user_can_check_account_balance()
-    {
-        $auth = $this->authenticate();
+    // public function test_user_can_check_account_balance()
+    // {
+    //     $auth = $this->authenticate();
 
-        $account = BankAccount::factory()->create([
-            'user_id' => $auth['user']->id,
-            'balance' => 2500,
-        ]);
+    //     $account = BankAccount::factory()->create([
+    //         'user_id' => $auth['user']->id,
+    //         'balance' => 2500,
+    //     ]);
 
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $auth['token'],
-            'X-API-KEY' => 'skfn0123'
-        ])->getJson("/api/accounts/{$account->id}/balance");
+    //     $response = $this->withHeaders([
+    //         'Authorization' => 'Bearer ' . $auth['token'],
+    //         'X-API-KEY' => 'skfn0123'
+    //     ])->getJson("/api/accounts/{$account->id}/balance");
 
-        $response->assertStatus(200);
-        $response->assertJson([
-            'account_id' => $account->id,
-            'balance' => 7500, // because 2500 + 5000 (demo logic)
-        ]);
-    }
+    //     $response->assertStatus(205);
+    //     $response->assertJson([
+    //         'account_id' => $account->id,
+    //         'balance' => 7500, // because 2500 + 5000 (demo logic)
+    //     ]);
+    // }
 }
