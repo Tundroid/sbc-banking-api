@@ -15,7 +15,8 @@ Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
     Route::get('/accounts/{id}/balance', [BankAccountController::class, 'balanceById'])->where('id', '[0-9]+');
     Route::get('/accounts/{account_number}/balance', [BankAccountController::class, 'balanceByAccountNumber']);
     Route::get('/accounts/{accountId}/transfers', [TransferController::class, 'history']);
-    Route::post('/transfers', [TransferController::class, 'store']);
+    Route::post('/transfers', [TransferController::class, 'store'])->middleware('validate.identifier');
+    // Route::post('/transfers/acc_number', [TransferController::class, 'storeByAccountNumber']);
 });
 
 
