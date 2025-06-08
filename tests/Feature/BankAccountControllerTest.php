@@ -202,7 +202,8 @@ class BankAccountControllerTest extends TestCase
         $response = $this->postJson('/api/accounts', $payload, $auth['headers']);
 
         $response->assertStatus(201);
-        $this->assertGreaterThan(0, $response['account']['balance']);
+        $this->assertGreaterThan(0, $response->json('account.balance'));
+
     }
 
     public function test_account_creation_with_invalid_payload_format()
