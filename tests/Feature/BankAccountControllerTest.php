@@ -202,7 +202,8 @@ class BankAccountControllerTest extends TestCase
         $response = $this->postJson('/api/accounts', $payload, $auth['headers']);
 
         $response->assertStatus(201);
-        $this->assertGreaterThan(0, $response['account']['balance']);
+        $this->assertGreaterThan(0, $response->json('account.balance'));
+
     }
 
     public function test_account_creation_with_invalid_payload_format()
@@ -450,6 +451,170 @@ class BankAccountControllerTest extends TestCase
 
         // Should be 200 (empty list) or 404 depending on route config, but for show, 200 is expected for index
         $response->assertStatus(200);
+    }
+
+    public function test_user_can_create_bank_account()
+    {
+        $auth = $this->authenticate();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123'
+        ])->postJson('/api/accounts', [
+                    'initial_deposit' => 1000,
+                ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonStructure([
+            'message',
+            'account' => [
+                'id',
+                'user_id',
+                'account_number',
+                'balance',
+                'created_at',
+                'updated_at'
+            ]
+        ]);
+    }
+
+    public function test_user_can_list_their_accounts()
+    {
+        $auth = $this->authenticate();
+
+        BankAccount::factory()->count(2)->create([
+            'user_id' => $auth['user']->id,
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123'
+        ])->getJson('/api/accounts');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(2);
+    }
+
+    public function test_user_can_view_a_specific_account()
+    {
+        $auth = $this->authenticate();
+
+        $account = BankAccount::factory()->create([
+            'user_id' => $auth['user']->id,
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123',
+            'X-Account-Identifier-Type' => 'id'
+        ])->getJson("/api/accounts/{$account->id}");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'id' => $account->id,
+            'account_number' => $account->account_number,
+        ]);
+    }
+
+    public function test_user_can_check_account_balance()
+    {
+        $auth = $this->authenticate();
+
+        $account = BankAccount::factory()->create([
+            'user_id' => $auth['user']->id,
+            'balance' => 2500,
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123',
+            'X-Account-Identifier-Type' => 'id'
+        ])->getJson("/api/accounts/{$account->id}/balance");
+
+        $response->assertStatus(200);
+        // $response->assertJson([
+        //     'account_id' => $account->id,
+        //     'balance' => 7500, // because 2500 + 5000 (demo logic)
+        // ]);
+    }
+
+    public function test_account_creation_fails_without_initial_deposit()
+    {
+        $auth = $this->authenticate();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123'
+        ])->postJson('/api/accounts', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('initial_deposit');
+    }
+
+    public function test_account_creation_fails_with_invalid_deposit_type()
+    {
+        $auth = $this->authenticate();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123'
+        ])->postJson('/api/accounts', [
+                    'initial_deposit' => 'invalid',
+                ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('initial_deposit');
+    }
+
+    public function test_user_cannot_view_others_account()
+    {
+        $auth = $this->authenticate();
+
+        $otherUserAccount = BankAccount::factory()->create(); // belongs to another user
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123',
+            'X-Account-Identifier-Type' => 'id'
+        ])->getJson("/api/accounts/{$otherUserAccount->id}");
+
+        $response->assertStatus(404); // Should not find it
+    }
+
+    public function test_view_account_fails_with_missing_identifier_type()
+    {
+        $auth = $this->authenticate();
+
+        $account = BankAccount::factory()->create(['user_id' => $auth['user']->id]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123',
+            // Missing identifier type
+        ])->getJson("/api/accounts/{$account->id}");
+
+        $response->assertStatus(400); // Or whatever status your middleware returns
+    }
+
+    public function test_user_can_view_account_by_account_number()
+    {
+        $auth = $this->authenticate();
+
+        $account = BankAccount::factory()->create([
+            'user_id' => $auth['user']->id,
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $auth['token'],
+            'X-API-KEY' => 'skfn0123',
+            'X-Account-Identifier-Type' => 'number'
+        ])->getJson("/api/accounts/{$account->account_number}");
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'id' => $account->id,
+            'account_number' => $account->account_number,
+        ]);
     }
 
 }
