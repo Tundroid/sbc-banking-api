@@ -13,8 +13,6 @@ class BankAccountController extends Controller
     public function store(Request $request)
     {
         $request->headers->set('Accept', 'application/json');
-            // Force JSON for API requests or if Accept: application/json
-        
 
         $request->validate([
             'initial_deposit' => 'required|numeric|min:0',
@@ -41,28 +39,42 @@ class BankAccountController extends Controller
     }
 
     // (Optional) Show a single account
-    public function show($id)
+    public function showById($id)
     {
         $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
 
         return response()->json($account);
     }
 
-    public function balance($id)
+    public function showByAccountNumber($acc_number)
     {
-        $account = BankAccount::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->first();
+        $account = BankAccount::where('user_id', Auth::id())
+            ->where('account_number', $acc_number)
+            ->firstOrFail();
 
-        if (!$account) {
-            return response()->json(['message' => 'Account not found or unauthorized'], 404);
-        }
+        return response()->json($account);
+    }
+
+
+    public function balanceById($id)
+    {
+        $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
 
         return response()->json([
-            'account_id' => $account->id,
-            'balance' => $account->balance + 5000, // Adding 5000 to the balance for demonstration
-            'currency' => 'USD', // Assuming USD for simplicity
-            'account_number' => $account->account_number,
+            'balance' => $account->balance,
+            'currency' => 'GBP',
+        ]);
+    }
+
+    public function balanceByAccountNumber($acc_number)
+    {
+        $account = BankAccount::where('user_id', Auth::id())
+            ->where('account_number', $acc_number)
+            ->firstOrFail();
+
+        return response()->json([
+            'balance' => $account->balance,
+            'currency' => 'GBP',
         ]);
     }
 
