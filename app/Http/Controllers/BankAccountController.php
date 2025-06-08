@@ -39,27 +39,27 @@ class BankAccountController extends Controller
     }
 
     // (Optional) Show a single account
-    public function show(Request $request, $id)
+    public function show(Request $request, $identifier)
     {
         $account = null;
         if ($request->identifier_type === 'id') {
-            $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
+            $account = BankAccount::where('user_id', Auth::id())->findOrFail($identifier);
         } else {
             $account = BankAccount::where('user_id', Auth::id())
-                ->where('account_number', $id)
+                ->where('account_number', $identifier)
                 ->firstOrFail();
         }
         return response()->json($account);
     }
 
-    public function balance(Request $request, $id)
+    public function balance(Request $request, $identifier)
     {
         $account = null;
         if ($request->identifier_type === 'id') {
-            $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
+            $account = BankAccount::where('user_id', Auth::id())->findOrFail($identifier);
         } else {
             $account = BankAccount::where('user_id', Auth::id())
-                ->where('account_number', $id)
+                ->where('account_number', $identifier)
                 ->firstOrFail();
         }
         return response()->json([

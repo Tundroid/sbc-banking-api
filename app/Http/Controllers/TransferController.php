@@ -61,11 +61,18 @@ class TransferController extends Controller
         return response()->json(['message' => 'Transfer successful'], 201);
     }
 
-    public function history($accountId)
+    public function history(Request $request, $identifier)
     {
-        $account = BankAccount::where('id', $accountId)
+        $account = null;
+        if ($request->identifier_type === 'id') {
+            $account = BankAccount::where('id', $identifier)
             ->where('user_id', Auth::id())
             ->firstOrFail();
+        } else {
+            $account = BankAccount::where('user_id', Auth::id())
+                ->where('account_number', $identifier)
+                ->firstOrFail();
+        }
 
         $transfers = Transfer::where('from_account_id', $account->id)
             ->orWhere('to_account_id', $account->id)

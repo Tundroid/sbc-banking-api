@@ -8,28 +8,16 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
+    
+    // Routes without 'validate.identifier'
     Route::get('/accounts', [BankAccountController::class, 'index']);
-    // Route::get('/accounts/{id}', [BankAccountController::class, 'showById'])->where('id', '[0-9]+');
-    // Route::get('/accounts/{account_number}', [BankAccountController::class, 'showByAccountNumber']);
-    Route::get('/accounts/{identifier}', [BankAccountController::class, 'show'])->middleware('validate.identifier');
     Route::post('/accounts', [BankAccountController::class, 'store']);
-    // Route::get('/accounts/{id}/balance', [BankAccountController::class, 'balanceById'])->where('id', '[0-9]+');
-    Route::get('/accounts/{identifier}/balance', [BankAccountController::class, 'balance'])->middleware('validate.identifier');
-    Route::get('/accounts/{accountId}/transfers', [TransferController::class, 'history']);
-    Route::post('/transfers', [TransferController::class, 'store'])->middleware('validate.identifier');
-    // Route::post('/transfers/acc_number', [TransferController::class, 'storeByAccountNumber']);
+
+    // Group routes that need 'validate.identifier'
+    Route::middleware('validate.identifier')->group(function () {
+        Route::post('/transfers', [TransferController::class, 'store']);
+        Route::get('/accounts/{identifier}', [BankAccountController::class, 'show']);
+        Route::get('/accounts/{identifier}/balance', [BankAccountController::class, 'balance']);
+        Route::get('/accounts/{identifier}/transfers', [TransferController::class, 'history']);
+    });
 });
-
-
-// Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
-//     Route::post('/transfers', [TransferController::class, 'store']);
-//     Route::get('/accounts/{accountId}/transfers', [TransferController::class, 'history']);
-// });
-
-
-
-// Route::middleware(['auth:sanctum', 'api.key'])->group(function () {
-//     Route::get('/accounts', [BankAccountController::class, 'index']);
-//     Route::post('/accounts', [BankAccountController::class, 'store']);
-//     Route::get('/accounts/{id}', [BankAccountController::class, 'show']);
-// });
