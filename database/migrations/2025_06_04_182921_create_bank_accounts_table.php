@@ -15,7 +15,7 @@ class CreateBankAccountsTable extends Migration
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // links account to user
+            $table->foreignId('user_id')->constrained()->onDelete('restrict'); // links account to user
             $table->string('account_number')->unique();
             $table->decimal('balance', 15, 2);
             $table->timestamps();
