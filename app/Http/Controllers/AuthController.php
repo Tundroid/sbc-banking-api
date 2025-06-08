@@ -11,6 +11,8 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     { 
+        $request->headers->set('Accept', 'application/json');
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|unique:users',
@@ -33,6 +35,8 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->headers->set('Accept', 'application/json');
+        
         $request->validate([
             'email'    => 'required|string|email',
             'password' => 'required|string',
