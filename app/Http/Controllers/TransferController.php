@@ -17,21 +17,7 @@ class TransferController extends Controller
 
         $request->headers->set('Accept', 'application/json');
 
-        // // Determine whether we're searching by ID or account number
-        // $identifierType = $request->header('X-Account-Identifier-Type');
-        // $identifierType = strtolower($identifierType);
-
-        // // Validate the header is present and one of the allowed values
-        // $validator = Validator::make(
-        //     ['identifier_type' => $identifierType],
-        //     ['identifier_type' => 'required|in:id,number']
-        // );
-
-        // if ($validator->fails()) {
-        //     return response()->json(['message' => 'Invalid or missing X-Account-Identifier-Type header.'], 400);
-        // }
-
-        if ($request->identifier_type !== 'id') {
+        if ($request->identifier_type === 'id') {
             $request->validate([
                 'from_account' => 'required|exists:bank_accounts,id',
                 'to_account' => 'required|exists:bank_accounts,id|different:from_account',

@@ -39,39 +39,29 @@ class BankAccountController extends Controller
     }
 
     // (Optional) Show a single account
-    public function showById($id)
+    public function show(Request $request, $id)
     {
-        $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
-
+        $account = null;
+        if ($request->identifier_type === 'id') {
+            $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
+        } else {
+            $account = BankAccount::where('user_id', Auth::id())
+                ->where('account_number', $id)
+                ->firstOrFail();
+        }
         return response()->json($account);
     }
 
-    public function showByAccountNumber($acc_number)
+    public function balance(Request $request, $id)
     {
-        $account = BankAccount::where('user_id', Auth::id())
-            ->where('account_number', $acc_number)
-            ->firstOrFail();
-
-        return response()->json($account);
-    }
-
-
-    public function balanceById($id)
-    {
-        $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
-
-        return response()->json([
-            'balance' => $account->balance,
-            'currency' => 'GBP',
-        ]);
-    }
-
-    public function balanceByAccountNumber($acc_number)
-    {
-        $account = BankAccount::where('user_id', Auth::id())
-            ->where('account_number', $acc_number)
-            ->firstOrFail();
-
+        $account = null;
+        if ($request->identifier_type === 'id') {
+            $account = BankAccount::where('user_id', Auth::id())->findOrFail($id);
+        } else {
+            $account = BankAccount::where('user_id', Auth::id())
+                ->where('account_number', $id)
+                ->firstOrFail();
+        }
         return response()->json([
             'balance' => $account->balance,
             'currency' => 'GBP',
