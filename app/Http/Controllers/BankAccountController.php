@@ -8,9 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class BankAccountController extends Controller
 {
+
     // Create a new bank account with initial deposit
     public function store(Request $request)
     {
+        $request->headers->set('Accept', 'application/json');
+            // Force JSON for API requests or if Accept: application/json
+        
+
         $request->validate([
             'initial_deposit' => 'required|numeric|min:0',
         ]);
